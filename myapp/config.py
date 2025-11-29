@@ -11,7 +11,7 @@ INSTAGRAM_USERNAME = os.getenv("INSTAGRAM_USERNAME", "")
 INSTAGRAM_PASSWORD = os.getenv("INSTAGRAM_PASSWORD", "")
 
 # ====== GROQ (Free API - script banane ke liye) ======
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+# GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 if not GROQ_API_KEY:
     raise ValueError("GROQ_API_KEY environment variable is required. Please set it in .env file.")
