@@ -1,0 +1,26 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.pytest_cache/
+db.sqlite3
+.env
+env/
+session.json
+*.log
+.DS_Store
+.idea/
+.vscode/
+# Media files
+images/
+videos/
+audio/
+*.mp4
+*.jpg
+*.png
+*.jpeg
+*.gif
+*.mp3
+*.wav
+scheduler_state.json
