@@ -11,7 +11,10 @@ INSTAGRAM_USERNAME = os.getenv("INSTAGRAM_USERNAME", "")
 INSTAGRAM_PASSWORD = os.getenv("INSTAGRAM_PASSWORD", "")
 
 # ====== GROQ (Free API - script banane ke liye) ======
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "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")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
+if not GROQ_API_KEY:
+    raise ValueError("GROQ_API_KEY environment variable is required. Please set it in .env file.")
 
 # ====== UNSPLASH (Free API - images ke liye) ======
 UNSPLASH_ACCESS_KEY = os.getenv("UNSPLASH_ACCESS_KEY", "")
