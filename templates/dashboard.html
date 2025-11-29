@@ -1,0 +1,456 @@
+{% extends "base.html" %}
+
+{% block title %}Automation Dashboard{% endblock %}
+
+{% block content %}
+<section class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-xl shadow p-6">
+        <p class="text-sm uppercase font-semibold text-gray-400">Latest Quote</p>
+        <p class="mt-3 text-gray-900 text-lg">{{ latest_quote|default:"No runs logged yet." }}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow p-6">
+        <p class="text-sm uppercase font-semibold text-gray-400">Last Run Status</p>
+        {% if last_status %}
+            <p class="mt-3 text-2xl font-semibold {{ status_color_class }}">{{ last_status|title }}</p>
+            <p class="text-xs text-gray-500 mt-1">{{ last_run_time }}</p>
+        {% else %}
+            <p class="mt-3 text-lg text-gray-500">Pending first run</p>
+        {% endif %}
+    </div>
+    <div class="bg-white rounded-xl shadow p-6">
+        <p class="text-sm uppercase font-semibold text-gray-400">Platform</p>
+        <p class="mt-3 text-2xl font-semibold text-gray-900">{{ last_platform|default:"—" }}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow p-6">
+        <p class="text-sm uppercase font-semibold text-gray-400 flex items-center">
+            <span class="inline-block w-2 h-2 rounded-full bg-green-500 mr-2"></span>
+            Scheduler Status
+        </p>
+        <p class="mt-3 text-lg font-medium text-gray-900">Active</p>
+        <p class="text-xs text-gray-500 mt-1">Next post in: <span id="nextPostCountdown">--:--:--</span></p>
+    </div>
+</section>
+
+<!-- Scheduler Status Section -->
+<section class="bg-white rounded-2xl shadow mb-8">
+    <div class="px-6 py-5 border-b border-gray-100">
+        <h2 class="text-lg font-semibold text-gray-900">Scheduled Posts</h2>
+        <p class="text-sm text-gray-500">Automated posting schedule and status</p>
+    </div>
+    <div class="p-6">
+        <div class="space-y-4">
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div class="flex items-center">
+                    <div class="w-3 h-3 rounded-full bg-green-500 mr-3"></div>
+                    <div>
+                        <p class="font-medium">Morning Post</p>
+                        <p class="text-sm text-gray-500">6:00 AM</p>
+                    </div>
+                </div>
+                <span class="px-3 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Active</span>
+            </div>
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div class="flex items-center">
+                    <div class="w-3 h-3 rounded-full bg-green-500 mr-3"></div>
+                    <div>
+                        <p class="font-medium">Afternoon Post</p>
+                        <p class="text-sm text-gray-500">12:00 PM</p>
+                    </div>
+                </div>
+                <span class="px-3 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Active</span>
+            </div>
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div class="flex items-center">
+                    <div class="w-3 h-3 rounded-full bg-green-500 mr-3"></div>
+                    <div>
+                        <p class="font-medium">Evening Post</p>
+                        <p class="text-sm text-gray-500">5:00 PM</p>
+                    </div>
+                </div>
+                <span class="px-3 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Active</span>
+            </div>
+        </div>
+        <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-blue-700">
+                        Scheduler is running in the background. Next post will be automatically published at <span id="nextScheduledTime" class="font-semibold">6:00 AM</span>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="bg-white rounded-2xl shadow p-6">
+        <h3 class="text-base font-semibold text-gray-900">Quick commands</h3>
+        <p class="text-sm text-gray-500 mb-4">Copy–paste snippets for CLI usage.</p>
+        <div class="space-y-3 text-xs font-mono">
+            <div class="bg-gray-50 rounded p-3">.\env\Scripts\Activate.ps1</div>
+            <div class="bg-gray-50 rounded p-3">python manage.py autopost --skip-post</div>
+            <div class="bg-gray-50 rounded p-3">python manage.py autopost</div>
+            <div class="bg-gray-50 rounded p-3">python manage.py autopost_image --skip-post</div>
+            <div class="bg-gray-50 rounded p-3">python manage.py autopost_image</div>
+            <div class="bg-gray-50 rounded p-3">python manage.py runserver</div>
+        </div>
+        <p class="text-xs text-gray-400 mt-4">Need more details? <a href="https://docs.djangoproject.com/en/5.2/ref/django-admin/#runserver" class="text-gray-900 underline">See Django CLI docs</a>.</p>
+    </div>
+    <div class="bg-white rounded-2xl shadow p-6">
+        <h3 class="text-base font-semibold text-gray-900">Checklist before posting</h3>
+        <ul class="mt-4 space-y-3 text-sm text-gray-700">
+            <li>✅ `.env` me Insta username/password + Groq key added</li>
+            <li>✅ `bg.jpg` aur `voice.mp3` available / write enabled</li>
+            <li>✅ Latest run ka status SUCCESS ya SKIPPED</li>
+            <li>✅ Instagram account 2FA handled / trusted device</li>
+        </ul>
+        <p class="text-xs text-gray-400 mt-4">Sab checked? CLI se autopost run karo ya scheduler se automate karo.</p>
+    </div>
+</section>
+
+<section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <!-- Instagram Post Section -->
+    <div class="bg-white rounded-2xl shadow">
+        <div class="px-6 py-6 border-b border-gray-100">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Instagram Post</h2>
+            <p class="text-sm text-gray-500 mb-4">Ek click mein Instagram par post kar do - Quote generate hoga, video banega ya sirf image ke saath post hoga.</p>
+            <div class="flex flex-wrap gap-3">
+                <button id="postBtn" onclick="postToInstagram()" class="text-base font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-2 rounded-lg flex items-center gap-2 hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg text-sm">
+                    <span id="postBtnText">🎬 Reel Post Karo</span>
+                    <span id="postBtnSpinner" class="hidden">⏳</span>
+                </button>
+                <button id="postImageBtn" onclick="postToInstagramImage()" class="text-sm font-semibold text-purple-700 bg-purple-50 px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-purple-100 border border-purple-200 transition-all">
+                    <span id="postImageBtnText">🖼 Image Post</span>
+                    <span id="postImageBtnSpinner" class="hidden">⏳</span>
+                </button>
+            </div>
+            <div id="postResult" class="mt-4 hidden"></div>
+        </div>
+    </div>
+
+    <!-- Twitter Post Section -->
+    <div class="bg-white rounded-2xl shadow">
+        <div class="px-6 py-6 border-b border-gray-100">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Twitter (X) Post</h2>
+            <p class="text-sm text-gray-500 mb-4">Ek click mein Twitter (X) par tweet kar do - Automatically generate and post tech quotes.</p>
+            <div class="flex flex-wrap gap-3">
+                <button id="postTwitterBtn" onclick="postToTwitter()" class="text-base font-semibold text-white bg-gradient-to-r from-blue-400 to-blue-600 px-4 py-2 rounded-lg flex items-center gap-2 hover:from-blue-500 hover:to-blue-700 transition-all shadow-lg text-sm">
+                    <span id="postTwitterBtnText">🐦 Tweet Karo</span>
+                    <span id="postTwitterBtnSpinner" class="hidden">⏳</span>
+                </button>
+            </div>
+            <div id="twitterPostResult" class="mt-4 hidden"></div>
+        </div>
+    </div>
+</section>
+
+<section class="bg-white rounded-2xl shadow">
+    <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+        <div>
+            <h2 class="text-lg font-semibold text-gray-900">Execution Timeline</h2>
+            <p class="text-sm text-gray-500">Last 10 autopost runs</p>
+        </div>
+        <a href="https://docs.djangoproject.com/en/5.2/ref/django-admin/#runserver" class="text-sm text-white bg-gray-900 px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-gray-800">
+            <span>Run via CLI</span>
+        </a>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-100">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Started</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Platform</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quote</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Video</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-100">
+                {% for run in latest_runs %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {{ run.created_at|date:"d M, H:i" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {{ run.get_platform_display }}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600 max-w-xs">
+                            {{ run.quote|truncatechars:80|default:"—" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold {{ run.status_class }}">
+                                {{ run.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500">
+                            {{ run.video_path|default:"pending" }}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-8 text-gray-400 text-sm">
+                            No execution history yet. Run <code class="bg-gray-100 px-2 py-1 rounded">python manage.py autopost --skip-post</code>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<script>
+async function postToTwitter() {
+    const btn = document.getElementById('postTwitterBtn');
+    const btnText = document.getElementById('postTwitterBtnText');
+    const btnSpinner = document.getElementById('postTwitterBtnSpinner');
+    const resultDiv = document.getElementById('twitterPostResult');
+    
+    // Disable button and show loading
+    btn.disabled = true;
+    btnText.classList.add('hidden');
+    btnSpinner.classList.remove('hidden');
+    resultDiv.classList.add('hidden');
+    resultDiv.innerHTML = '';
+    
+    try {
+        const response = await fetch('/post-twitter/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            resultDiv.className = 'mt-4 p-4 bg-green-50 border border-green-200 rounded-lg';
+            resultDiv.innerHTML = `
+                <div class="text-green-800 font-semibold mb-2">${data.message || '✅ Tweet Successful!'}</div>
+                <div class="text-sm text-green-700">${data.quote || 'N/A'}</div>
+                <div class="text-xs text-green-600 mt-2">Tweet ID: ${data.tweet_id || 'N/A'}</div>
+                <div class="text-xs text-gray-500 mt-2">Page refresh karo latest status dekhne ke liye</div>
+            `;
+        } else {
+            resultDiv.className = 'mt-4 p-4 bg-red-50 border border-red-200 rounded-lg';
+            resultDiv.innerHTML = `
+                <div class="text-red-800 font-semibold mb-2">❌ Error</div>
+                <div class="text-sm text-red-700">${data.error || 'Unknown error occurred'}</div>
+            `;
+        }
+    } catch (error) {
+        resultDiv.className = 'mt-4 p-4 bg-red-50 border border-red-200 rounded-lg';
+        resultDiv.innerHTML = `
+            <div class="text-red-800 font-semibold mb-2">❌ Network Error</div>
+            <div class="text-sm text-red-700">${error.message}</div>
+        `;
+    } finally {
+        resultDiv.classList.remove('hidden');
+        btn.disabled = false;
+        btnText.classList.remove('hidden');
+        btnSpinner.classList.add('hidden');
+    }
+}
+
+async function postToInstagram() {
+    const btn = document.getElementById('postBtn');
+    const btnText = document.getElementById('postBtnText');
+    const btnSpinner = document.getElementById('postBtnSpinner');
+    const resultDiv = document.getElementById('postResult');
+    
+    // Disable button and show loading
+    btn.disabled = true;
+    btnText.classList.add('hidden');
+    btnSpinner.classList.remove('hidden');
+    resultDiv.classList.add('hidden');
+    resultDiv.innerHTML = '';
+    
+    try {
+        const response = await fetch('/post-instagram/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            resultDiv.className = 'mt-4 p-4 bg-green-50 border border-green-200 rounded-lg';
+            resultDiv.innerHTML = `
+                <div class="text-green-800 font-semibold mb-2">${data.message || '✅ Success!'}</div>
+                <div class="text-sm text-green-700">Quote: ${data.quote || 'N/A'}</div>
+                <div class="text-xs text-green-600 mt-2">Video: ${data.video_path || 'N/A'}</div>
+                <div class="text-xs text-gray-500 mt-2">Page refresh karo latest status dekhne ke liye</div>
+            `;
+        } else {
+            resultDiv.className = 'mt-4 p-4 bg-red-50 border border-red-200 rounded-lg';
+            resultDiv.innerHTML = `
+                <div class="text-red-800 font-semibold mb-2">❌ Error</div>
+                <div class="text-sm text-red-700">${data.error || 'Unknown error occurred'}</div>
+            `;
+        }
+    } catch (error) {
+        resultDiv.className = 'mt-4 p-4 bg-red-50 border border-red-200 rounded-lg';
+        resultDiv.innerHTML = `
+            <div class="text-red-800 font-semibold mb-2">❌ Network Error</div>
+            <div class="text-sm text-red-700">${error.message}</div>
+        `;
+    } finally {
+        resultDiv.classList.remove('hidden');
+        btn.disabled = false;
+        btnText.classList.remove('hidden');
+        btnSpinner.classList.add('hidden');
+    }
+}
+
+// Function to update the countdown timer
+function updateCountdown() {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    
+    // Define the schedule times
+    const scheduleTimes = [6, 12, 17];
+    
+    // Find the next scheduled time
+    let nextTime = null;
+    for (const hour of scheduleTimes) {
+        const scheduleTime = new Date(now);
+        scheduleTime.setHours(hour, 0, 0, 0);
+        
+        // If the time is in the future today
+        if (scheduleTime > now) {
+            nextTime = scheduleTime;
+            break;
+        }
+    }
+    
+    // If no more times today, use first time tomorrow
+    if (!nextTime) {
+        nextTime = new Date(now);
+        nextTime.setDate(now.getDate() + 1);
+        nextTime.setHours(scheduleTimes[0], 0, 0, 0);
+    }
+    
+    // Update the next scheduled time display
+    document.getElementById('nextScheduledTime').textContent = 
+        nextTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    
+    // Update countdown every second
+    const countdownElement = document.getElementById('nextPostCountdown');
+    
+    function update() {
+        const now = new Date();
+        const diffMs = nextTime - now;
+        
+        if (diffMs <= 0) {
+            countdownElement.textContent = 'Now';
+            // Refresh the page when it's time to post
+            setTimeout(() => { window.location.reload(); }, 1000);
+            return;
+        }
+        
+        const diffSecs = Math.floor(diffMs / 1000);
+        const hours = Math.floor(diffSecs / 3600);
+        const minutes = Math.floor((diffSecs % 3600) / 60);
+        const seconds = diffSecs % 60;
+        
+        countdownElement.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+    
+    // Update immediately and then every second
+    update();
+    setInterval(update, 1000);
+}
+
+// Initialize the countdown when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    updateCountdown();
+    
+    // Update the status indicators based on current time
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    
+    // Update the status of each scheduled post
+    const scheduleTimes = [
+        { id: 'morning', hour: 6, element: document.querySelector('div:has(+ div:has(+ div:has(p:contains("Morning Post"))))') },
+        { id: 'afternoon', hour: 12, element: document.querySelector('div:has(+ div:has(+ div:has(p:contains("Afternoon Post"))))') },
+        { id: 'evening', hour: 17, element: document.querySelector('div:has(+ div:has(+ div:has(p:contains("Evening Post"))))') }
+    ];
+    
+    scheduleTimes.forEach(schedule => {
+        const statusElement = schedule.element;
+        if (currentHour > schedule.hour || (currentHour === schedule.hour && currentMinute > 0)) {
+            // If the scheduled time has passed
+            statusElement.classList.remove('bg-green-100', 'text-green-800');
+            statusElement.classList.add('bg-gray-100', 'text-gray-800');
+            statusElement.textContent = 'Completed';
+        } else if (currentHour === schedule.hour) {
+            // If it's the current hour
+            statusElement.classList.remove('bg-green-100', 'text-green-800');
+            statusElement.classList.add('bg-yellow-100', 'text-yellow-800');
+            statusElement.textContent = 'Posting...';
+        }
+    });
+});
+
+async function postToInstagramImage() {
+    const btn = document.getElementById('postImageBtn');
+    const btnText = document.getElementById('postImageBtnText');
+    const btnSpinner = document.getElementById('postImageBtnSpinner');
+    const resultDiv = document.getElementById('postResult');
+
+    btn.disabled = true;
+    btnText.classList.add('hidden');
+    btnSpinner.classList.remove('hidden');
+    resultDiv.classList.add('hidden');
+    resultDiv.innerHTML = '';
+
+    try {
+        const response = await fetch('/post-instagram-image/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            resultDiv.className = 'mt-4 p-4 bg-green-50 border border-green-200 rounded-lg';
+            resultDiv.innerHTML = `
+                <div class="text-green-800 font-semibold mb-2">${data.message || '✅ Success!'}</div>
+                <div class="text-sm text-green-700">Quote: ${data.quote || 'N/A'}</div>
+                <div class="text-xs text-gray-500 mt-2">Page refresh karo latest status dekhne ke liye</div>
+            `;
+        } else {
+            resultDiv.className = 'mt-4 p-4 bg-red-50 border border-red-200 rounded-lg';
+            resultDiv.innerHTML = `
+                <div class="text-red-800 font-semibold mb-2">❌ Error</div>
+                <div class="text-sm text-red-700">${data.error || 'Unknown error occurred'}</div>
+            `;
+        }
+    } catch (error) {
+        resultDiv.className = 'mt-4 p-4 bg-red-50 border border-red-200 rounded-lg';
+        resultDiv.innerHTML = `
+            <div class="text-red-800 font-semibold mb-2">❌ Network Error</div>
+            <div class="text-sm text-red-700">${error.message}</div>
+        `;
+    } finally {
+        resultDiv.classList.remove('hidden');
+        btn.disabled = false;
+        btnText.classList.remove('hidden');
+        btnSpinner.classList.add('hidden');
+    }
+}
+</script>
+{% endblock %}
+
