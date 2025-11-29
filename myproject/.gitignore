@@ -1,0 +1,42 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.pytest_cache/
+db.sqlite3
+<<<<<<< HEAD
+myproject/db.sqlite3
+.env
+myproject/.env
+env/
+myproject/env/
+session.json
+images/
+videos/
+audio/
+*.log
+.DS_Store
+.idea/
+.vscode/
+=======
+.env
+env/
+session.json
+*.log
+.DS_Store
+.idea/
+.vscode/
+# Media files
+images/
+videos/
+audio/
+*.mp4
+*.jpg
+*.png
+*.jpeg
+*.gif
+*.mp3
+*.wav
+scheduler_state.json
+>>>>>>> e85a34d (Initial commit: Django social media automation with Render deployment config)
