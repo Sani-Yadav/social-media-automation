@@ -1,42 +1,20 @@
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-*.egg-info/
-.pytest_cache/
+.env
+.env.test
 db.sqlite3
-<<<<<<< HEAD
-myproject/db.sqlite3
-.env
-myproject/.env
-env/
-myproject/env/
 session.json
+
+# Virtual Environment
+env/
+venv/
+
+# Generated Content
 images/
 videos/
 audio/
 *.log
+
+# OS generated files
 .DS_Store
-.idea/
-.vscode/
-=======
-.env
-env/
-session.json
-*.log
-.DS_Store
-.idea/
-.vscode/
-# Media files
-images/
-videos/
-audio/
-*.mp4
-*.jpg
-*.png
-*.jpeg
-*.gif
-*.mp3
-*.wav
-scheduler_state.json
->>>>>>> e85a34d (Initial commit: Django social media automation with Render deployment config)
+Thumbs.db

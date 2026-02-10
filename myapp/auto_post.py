@@ -59,18 +59,22 @@ def generate_tech_script():
     # prepare a safe fallback message in case the API is unavailable or unauthorized
     fallback = f"💡 {random_topic} seekhna shuru karo - tech career ka first step hai yeh!"
 
+    # List of models to try in case one fails
+    available_models = ["llama-3.3-70b-versatile", "llama3-70b-8192", "mixtral-8x7b-32768"]
+
     for attempt in range(max_retries):
         try:
             prompt = random.choice(tech_prompts)
+            current_model = available_models[attempt % len(available_models)]
             print(f"📱 Tech Topic: {random_topic}")
             print(f"💡 Prompt: {prompt}")
-            print(f"🔄 Attempt {attempt + 1}/{max_retries}...")
+            print(f"🔄 Attempt {attempt + 1}/{max_retries} using model: {current_model}...")
 
             response = requests.post(
                 "https://api.groq.com/openai/v1/chat/completions",
                 headers={"Authorization": f"Bearer {GROQ_API_KEY}"},
                 json={
-                    "model": "llama-3.3-70b-versatile",  # Updated model
+                    "model": current_model,
                     "messages": [{"role": "user", "content": prompt}],
                     "temperature": 1.3,
                     "max_tokens": 200,
@@ -84,7 +88,7 @@ def generate_tech_script():
             if response.status_code == 401:
                 # Unauthorized: API key invalid/expired — don't retry
                 print("⚠️ Groq API returned 401 Unauthorized. Check GROQ_API_KEY in your .env or environment variables.")
-                print(f"⚠️ Response snippet: {response.text[:200]}")
+                print(f"⚠️ Response snippet: {response.text}")
                 return fallback
 
             if response.status_code != 200:
@@ -135,6 +139,8 @@ def generate_tech_script():
         except Exception as e:
             print(f"⚠️ Attempt {attempt + 1} failed: {e}")
             if attempt == max_retries - 1:
+                print("❌ Groq API failed after all retries. Using fallback text.")
+                print("👉 Check your GROQ_API_KEY in config.py or .env")
                 fallback = f"💡 {random_topic} seekhna shuru karo - tech career ka first step hai yeh!"
                 return fallback
 
@@ -457,6 +463,7 @@ def post_instagram(video_path):
 
         # Simple clip_upload call
         try:
+            print("📤 Uploading reel to Instagram (this may take a minute)...")
             resp = cl.clip_upload(video_path, caption=caption)
             # Return instagrapi response (could be model object)
             return {"ok": True, "response": resp}
@@ -469,7 +476,14 @@ def post_instagram(video_path):
                 return {"ok": False, "error": error_str}
 
     except Exception as e:
-        return {"ok": False, "error": str(e), "hint": "Check 2FA, suspicious login alerts, and session.json"}
+        # Auto-fix: Delete session file if upload fails (often fixes 'Unknown' or 'LoginRequired')
+        if os.path.exists("session.json"):
+            try:
+                os.remove("session.json")
+                print("⚠️ Session file corrupted or expired. Deleted 'session.json'.")
+            except:
+                pass
+        return {"ok": False, "error": str(e), "hint": "Session reset. Please run the script again to login freshly."}
 
 
 # ====== 4. Instagram Post (Image-only) ======
@@ -531,7 +545,14 @@ def main():
 
     video = create_reel_video(tech_content)
     if video:
-        post_instagram(video)
+        print("🚀 Instagram par upload shuru kar raha hoon...")
+        result = post_instagram(video)
+        if result.get("ok"):
+            print("✅ Instagram Post Successful!")
+        else:
+            print(f"❌ Instagram Post Failed: {result.get('error')}")
+            if result.get("hint"):
+                print(f"💡 Hint: {result.get('hint')}")
 
     print("\n🎉 KHTM! Ab Instagram kholo aur dekho Tech Reel live hai ya nahi 😎")
 
